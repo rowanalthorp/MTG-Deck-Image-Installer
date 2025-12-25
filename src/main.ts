@@ -64,8 +64,12 @@ document.getElementById("chooseFolder")!.addEventListener("click", async () => {
         log(`Error fetching ${entry.name}: ${(err as Error).message}`);
       }
     }
-  
-    const ttsJSON = buildTTSJSON("My Custom Deck", allCards);
+
+    const cardsForTTS = allCards.map(card => ({
+        name: card.name,
+        imageUri: card.image
+      }));
+    const ttsJSON = buildTTSJSON("My Custom Deck", cardsForTTS);
     const ttsBlob = new Blob([JSON.stringify(ttsJSON, null, 2)], { type: "application/json" });
   
     if (useFolder && rootDir) {

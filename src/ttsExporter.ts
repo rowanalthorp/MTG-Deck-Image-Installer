@@ -1,39 +1,30 @@
-export function buildTTSJSON(deckName: string, cards: any[]) {
-    const containedObjects = cards.map((card, index) => {
-      const cardId = (index + 1) * 100; 
-      const key = (index + 1).toString();
-      
-      return {
-        Name: "Card",
-        Nickname: card.name || "MTG Card",
-        CardID: cardId,
-        Transform: {
-          posX: 0, posY: 0, posZ: 0,
-          rotX: 0, rotY: 180, rotZ: 180,
-          scaleX: 1, scaleY: 1, scaleZ: 1
-        },
-        CustomDeck: {
-          [key]: {
-            FaceURL: card.imageUri,
-            BackURL: "https://deckmaster.info/images/cards/back.jpg",
-            NumWidth: 1,
-            NumHeight: 1,
-            BackIsHidden: true,
-            UniqueBack: false,
-            Type: 0
-          }
-        }
-      };
-    });
+export function buildTTSJSON(deckName: string, cards: { name: string; imageUri: string }[]) {
+    if (cards.length === 0) {
+      throw new Error("Deck must contain at least one card.");
+    }
   
-    const deckIds = containedObjects.map(obj => obj.CardID);
-    
-    // Fixes the "Implicit any" indexing error
-    const combinedCustomDeck: { [key: string]: any } = {};
-    containedObjects.forEach((obj, index) => {
-      const key = (index + 1).toString();
-      combinedCustomDeck[key] = obj.CustomDeck[key];
-    });
+    // Generate unique CardIDs starting at 1001
+    const deckIDs = cards.map((_, index) => 1000 + index + 1);
+  
+    // ContainedObjects: minimal info per card
+    const containedObjects = cards.map((card, index) => ({
+      Name: "Card",
+      Nickname: card.name || "Card",
+      CardID: deckIDs[index]
+    }));
+  
+    // Single CustomDeck for all cards
+    const customDeck = {
+      "1": {
+        FaceURL: cards[0].imageUri, // For single card sheets, this is fine
+        BackURL: "https://deckmaster.info/images/cards/back.jpg",
+        NumWidth: 1,
+        NumHeight: cards.length, // one card per row
+        BackIsHidden: true,
+        UniqueBack: false,
+        Type: 0
+      }
+    };
   
     return {
       SaveName: deckName,
@@ -44,14 +35,21 @@ export function buildTTSJSON(deckName: string, cards: any[]) {
           Name: "DeckCustom",
           Nickname: deckName,
           Transform: {
-            posX: 0, posY: 1, posZ: 0,
-            rotX: 0, rotY: 180, rotZ: 180,
-            scaleX: 1, scaleY: 1, scaleZ: 1
+            posX: 0,
+            posY: 1,
+            posZ: 0,
+            rotX: 0,
+            rotY: 180,
+            rotZ: 180,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1
           },
-          DeckIDs: deckIds,
-          CustomDeck: combinedCustomDeck,
+          DeckIDs: deckIDs,
+          CustomDeck: customDeck,
           ContainedObjects: containedObjects
         }
       ]
     };
   }
+  
