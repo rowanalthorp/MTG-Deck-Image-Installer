@@ -1,0 +1,29 @@
+{
+  "name": "mtg-table-top-deck-automation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rowanalthorp/mtg-table-top-deck-automation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rowanalthorp/mtg-table-top-deck-automation/issues"
+  },
+  "homepage": "https://github.com/rowanalthorp/mtg-table-top-deck-automation#readme",
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "description": ""
+}
