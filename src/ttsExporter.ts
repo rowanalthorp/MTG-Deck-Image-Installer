@@ -2,24 +2,21 @@ export function buildTTSJSON(deckName: string, cards: { name: string; imageUri: 
     if (cards.length === 0) {
       throw new Error("Deck must contain at least one card.");
     }
+
+    const deckIDs = cards.map((_, index) => 1000 + index + 1); // Perhaps change this later
   
-    // Generate unique CardIDs starting at 1001
-    const deckIDs = cards.map((_, index) => 1000 + index + 1);
-  
-    // ContainedObjects: minimal info per card
     const containedObjects = cards.map((card, index) => ({
       Name: "Card",
       Nickname: card.name || "Card",
       CardID: deckIDs[index]
     }));
   
-    // Single CustomDeck for all cards
     const customDeck = {
       "1": {
-        FaceURL: cards[0].imageUri, // For single card sheets, this is fine
-        BackURL: "https://deckmaster.info/images/cards/back.jpg",
+        FaceURL: cards[0].imageUri,
+        BackURL: "https://imgur.com/gallery/magic-gathering-card-back-19zDFYc",
         NumWidth: 1,
-        NumHeight: cards.length, // one card per row
+        NumHeight: cards.length,
         BackIsHidden: true,
         UniqueBack: false,
         Type: 0
