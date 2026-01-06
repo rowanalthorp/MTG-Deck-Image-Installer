@@ -1,4 +1,3 @@
-import JSZip from "https://esm.sh/jszip@3.10.1";
 import { parseDeck } from "./deckParser.js";
 import { fetchCard, getImageURL } from "./scryfallAPI.js";
 import { chooseFolder, ensureDir, writeFile } from "./fileSystem.js";
@@ -9,10 +8,13 @@ const logEl = document.getElementById("log");
 let rootDir = null;
 
 function log(msg) {
-    logEl.textContent += msg + "\n";
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    logEl.textContent += `[${timestamp}] ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
 }
 
-function downloadBlob(blob, filename) {
+function downloadJSON(data, filename) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -27,7 +29,7 @@ const supportsFileSystem = "showDirectoryPicker" in window;
 
 document.getElementById("chooseFolder").addEventListener("click", async () => {
     if (!supportsFileSystem) {
-        alert("Your browser does not support folder selection. Will use ZIP download instead.");
+        alert("Your browser does not support folder selection. Will use direct download instead.");
         return;
     }
     rootDir = await chooseFolder();
@@ -40,9 +42,6 @@ document.getElementById("run").addEventListener("click", async () => {
     log(`Parsed ${deckEntries.length} cards`);
 
     const useFolder = !!rootDir;
-    const zip = useFolder ? null : new JSZip();
-    const imagesDir = useFolder ? await ensureDir(rootDir, "images") : null;
-
     const allCards = [];
 
     for (const entry of deckEntries) {
@@ -53,16 +52,13 @@ document.getElementById("run").addEventListener("click", async () => {
             if (!imgURL) continue;
 
             allCards.push({ name: entry.name, image: imgURL, qty: entry.qty });
-            const res = await fetch(imgURL);
-            const blob = await res.blob();
-            const safeName = entry.name.replace(/[\/\\:?*"<>|]/g, "");
-
-            if (useFolder && imagesDir) {
+            
+            if (useFolder) {
+                const imagesDir = await ensureDir(rootDir, "images");
+                const res = await fetch(imgURL);
+                const blob = await res.blob();
+                const safeName = entry.name.replace(/[\/\\:?*"<>|]/g, "");
                 await writeFile(imagesDir, `${safeName}.jpg`, blob);
-            } else if (zip) {
-                for (let i = 0; i < entry.qty; i++) {
-                    zip.file(`${safeName}-${i + 1}.jpg`, blob);
-                }
             }
         } catch (err) {
             log(`Error fetching ${entry.name}: ${err.message}`);
@@ -71,17 +67,19 @@ document.getElementById("run").addEventListener("click", async () => {
 
     const cardsForTTS = allCards.map(card => ({
         name: card.name,
-        imageUri: card.image
+        imageUri: card.image,
+        qty: card.qty
     }));
+
     const ttsJSON = buildTTSJSON("My Custom Deck", cardsForTTS);
-    const ttsBlob = new Blob([JSON.stringify(ttsJSON, null, 2)], { type: "application/json" });
 
     if (useFolder && rootDir) {
+        const ttsBlob = new Blob([JSON.stringify(ttsJSON, null, 2)], { type: "application/json" });
         await writeFile(rootDir, "tts_deck.json", ttsBlob);
-    } else if (zip) {
-        zip.file("tts_deck.json", ttsBlob);
-        const zipBlob = await zip.generateAsync({ type: "blob" });
-        downloadBlob(zipBlob, "mtg_deck.zip");
+        log("Saved to folder!");
+    } else {
+        downloadJSON(ttsJSON, "mtg_deck.json");
+        log("JSON downloaded!");
     }
 
     log("Done!");
