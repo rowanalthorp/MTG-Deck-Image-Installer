@@ -1,4 +1,4 @@
-import JSZip from "jszip";
+import JSZip from "https://esm.sh/jszip@3.10.1";
 import { parseDeck } from "./deckParser.js";
 import { fetchCard, getImageURL } from "./scryfallAPI.js";
 import { chooseFolder, ensureDir, writeFile } from "./fileSystem.js";
