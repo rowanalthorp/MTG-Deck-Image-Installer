@@ -1,28 +1,19 @@
-type DirHandle = any;
-export async function chooseFolder(): Promise<DirHandle> {
+export async function chooseFolder() {
     // @ts-ignore
-    return await (window as any).showDirectoryPicker();
+    return await window.showDirectoryPicker();
 }
 
-export async function ensureDir(
-    parent: DirHandle,
-    name: string
-): Promise<DirHandle> {
+export async function ensureDir(parent, name) {
     return await parent.getDirectoryHandle(name, { create: true });
 }
 
-export async function writeFile(
-    dir: DirHandle,
-    name: string,
-    data: Blob | string
-) {
+export async function writeFile(dir, name, data) {
     const handle = await dir.getFileHandle(name, { create: true });
     const writable = await handle.createWritable();
-    
-    const blob =
-    typeof data === "string"
-      ? new Blob([data], { type: "application/json" })
-      : data;
+
+    const blob = typeof data === "string"
+        ? new Blob([data], { type: "application/json" })
+        : data;
 
     await writable.write(blob);
     await writable.close();

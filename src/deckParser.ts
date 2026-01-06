@@ -1,6 +1,4 @@
-export type DeckEntry = { qty: number; name: string };
-
-export function parseDeck(text: string): DeckEntry[] {
+export function parseDeck(text) {
     return text
         .split("\n")
         .map(l => l.trim())
@@ -11,5 +9,5 @@ export function parseDeck(text: string): DeckEntry[] {
             if (!match) return null;
             return { qty: parseInt(match[1]), name: match[2].trim() };
         })
-        .filter((e): e is DeckEntry => e !== null);
+        .filter(e => e !== null);
 }
