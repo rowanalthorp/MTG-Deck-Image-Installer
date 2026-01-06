@@ -32,8 +32,12 @@ document.getElementById("chooseFolder").addEventListener("click", async () => {
         alert("Your browser does not support folder selection. Will use direct download instead.");
         return;
     }
-    rootDir = await chooseFolder();
-    log("Folder selected!");
+	try {
+	  rootDir = await chooseFolder();
+	  log("Folder selected!");
+	} catch (err) {
+	  log("Folder selection canceled.");
+	}
 });
 
 document.getElementById("run").addEventListener("click", async () => {
