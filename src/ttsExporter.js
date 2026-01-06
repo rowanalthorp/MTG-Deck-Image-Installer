@@ -8,26 +8,25 @@ export function buildTTSJSON(deckName, cards) {
     const containedObjects = [];
 
     cards.forEach((card, index) => {
-        // 1. Create a unique ID for this card's "deck" (1, 2, 3...)
+        // We give each card its own "Deck ID" starting at 1
         const deckId = index + 1;
         
-        // 2. Generate the CardID (e.g., 100, 200, 300...)
-        // TTS uses the last two digits (00) as the index on the image
+        // CardID must be (DeckID * 100). 
+        // Example: Deck 1 becomes CardID 100. Deck 2 becomes CardID 200.
         const cardId = deckId * 100;
         deckIDs.push(cardId);
 
-        // 3. Add this card to the CustomDeck registry
+        // We create a SEPARATE entry for every card image in the CustomDeck list
         customDeck[deckId.toString()] = {
             FaceURL: card.imageUri,
-            BackURL: "https://i.imgur.com/19zDFYc.png", // Use a direct link to the image
-            NumWidth: 1,
-            NumHeight: 1,
+            BackURL: "https://i.imgur.com/19zDFYc.png", // Use a direct .png link
+            NumWidth: 1,  // Since it's a single image, width is 1
+            NumHeight: 1, // Since it's a single image, height is 1
             BackIsHidden: true,
             UniqueBack: false,
             Type: 0
         };
 
-        // 4. Create the actual card object
         containedObjects.push({
             Name: "Card",
             Nickname: card.name || "Card",
@@ -37,8 +36,6 @@ export function buildTTSJSON(deckName, cards) {
 
     return {
         SaveName: deckName,
-        Date: "",
-        VersionNumber: "",
         ObjectStates: [
             {
                 Name: "DeckCustom",
@@ -49,7 +46,7 @@ export function buildTTSJSON(deckName, cards) {
                     scaleX: 1, scaleY: 1, scaleZ: 1
                 },
                 DeckIDs: deckIDs,
-                CustomDeck: customDeck,
+                CustomDeck: customDeck, // This now contains all 95 images
                 ContainedObjects: containedObjects
             }
         ]
