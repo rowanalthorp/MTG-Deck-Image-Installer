@@ -1,20 +1,23 @@
-// Helper to generate the 6-character hex GUIDs TTS requires
-const generateGUID = () => Math.random().toString(16).substring(2, 8);
-
-function generateTTSDeck(cards) {
-    const deckGUID = generateGUID();
-    const deckIds = [];
+export function buildTTSJSON(deckName, cards) {
+    if (cards.length === 0) {
+        throw new Error("Deck must contain at least one card.");
+    }
     const customDeck = {};
+    const deckIDs = [];
     const containedObjects = [];
 
     cards.forEach((card, index) => {
-        const cardId = (index + 1) * 100; // Standard TTS ID format
-        deckIds.push(cardId);
+        // We give each card a unique Deck ID (1, 2, 3...)
+        // CardID is always (DeckID * 100)
+        const deckId = index + 1;
+        const cardId = deckId * 100;
 
-        // Define the custom image for this specific card
-        customDeck[index + 1] = {
-            FaceURL: card.image_url,
-            BackURL: "https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg",
+        deckIDs.push(cardId);
+
+        // Every card is its own 1x1 grid
+        customDeck[deckId.toString()] = {
+            FaceURL: card.imageUri,
+            BackURL: "https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013", // MTG Back
             NumWidth: 1,
             NumHeight: 1,
             BackIsHidden: true,
@@ -22,45 +25,23 @@ function generateTTSDeck(cards) {
             Type: 0
         };
 
-        // Define the individual card object inside the deck
+        // THIS IS WHAT MAKES IT SEARCHABLE
         containedObjects.push({
             Name: "Card",
-            Nickname: card.name,
-            CardID: cardId,
-            GUID: generateGUID(),
-            Transform: { posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 }
+            Nickname: card.name, // The search name
+            CardID: cardId       // Must match the math above!
         });
     });
 
-    // The main Deck Object
-    const deckObject = {
-        Name: "Deck",
-        Nickname: "My Generated Deck",
-        Transform: { posX: 0, posY: 1, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 },
-        GUID: deckGUID,
-        DeckIDs: deckIds,
-        CustomDeck: customDeck,
-        ContainedObjects: containedObjects
-    };
-
-    // The mandatory Wrapper for TTS Save Files
     return {
-        SaveName: "My Custom Deck",
-        Date: "",
-        VersionNumber: "",
-        GameMode: "",
-        GameType: "",
-        GameComplexity: "",
-        Tags: [],
-        Gravity: 0.5,
-        PlayArea: 0.5,
-        Table: "",
-        Sky: "",
-        Note: "",
-        TabStates: {},
-        LuaScript: "",
-        LuaScriptState: "",
-        XmlUI: "",
-        ObjectStates: [deckObject] // Put the deck inside the array
+        SaveName: deckName,
+        ObjectStates: [{
+            Name: "DeckCustom",
+            Nickname: deckName,
+            Transform: { posX: 0, posY: 1, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 },
+            DeckIDs: deckIDs,
+            CustomDeck: customDeck,
+            ContainedObjects: containedObjects
+        }]
     };
 }
