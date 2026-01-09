@@ -19,7 +19,7 @@ export function buildTTSJSON(deckName, cards) {
         // We create a SEPARATE entry for every card image in the CustomDeck list
         customDeck[deckId.toString()] = {
             FaceURL: card.imageUri,
-            BackURL: "https://i.imgur.com/19zDFYc.png", // Use a direct .png link
+            BackURL: "https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013", // Use a direct .png link
             NumWidth: 1,  // Since it's a single image, width is 1
             NumHeight: 1, // Since it's a single image, height is 1
             BackIsHidden: true,
