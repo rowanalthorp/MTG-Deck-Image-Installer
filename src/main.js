@@ -69,11 +69,16 @@ document.getElementById("run").addEventListener("click", async () => {
         }
     }
 
-    const cardsForTTS = allCards.map(card => ({
-        name: card.name,
-        imageUri: card.image,
-        qty: card.qty
-    }));
+    const cardsForTTS = [];
+    allCards.forEach(card => {
+        // We loop based on the 'qty' (quantity) from your decklist
+        for (let i = 0; i < card.qty; i++) {
+            cardsForTTS.push({
+                name: card.name,
+                imageUri: card.image
+            });
+    }
+});
 
     const ttsJSON = buildTTSJSON("My Custom Deck", cardsForTTS);
 

@@ -7,30 +7,49 @@ export function buildTTSJSON(deckName, cards) {
     const deckIDs = [];
     const containedObjects = [];
 
+    // TTS Grid Settings
+    const cardsPerSheet = 70; // 10x7 grid
+    const cardBackUrl = "https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013";
+
     cards.forEach((card, index) => {
-        // We give each card its own "Deck ID" starting at 1
-        const deckId = index + 1;
+        // 1. Calculate which sheet this card is on (0-69 is Sheet 1, 70-99 is Sheet 2)
+        const sheetIndex = Math.floor(index / cardsPerSheet);
+        const deckId = sheetIndex + 1; // Deck IDs usually start at 1
+
+        // 2. Calculate the CardID
+        // Format: (DeckID * 100) + (Position on sheet)
+        // Card 1 on Sheet 1: 100. Card 70 on Sheet 1: 169.
+        // Card 1 on Sheet 2: 200.
+        const positionOnSheet = index % cardsPerSheet;
+        const cardId = (deckId * 100) + positionOnSheet;
         
-        // CardID must be (DeckID * 100). 
-        // Example: Deck 1 becomes CardID 100. Deck 2 becomes CardID 200.
-        const cardId = deckId * 100;
         deckIDs.push(cardId);
 
-        // We create a SEPARATE entry for every card image in the CustomDeck list
-        customDeck[deckId.toString()] = {
-            FaceURL: card.imageUri,
-            BackURL: "https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013", // Use a direct .png link
-            NumWidth: 1,  // Since it's a single image, width is 1
-            NumHeight: 1, // Since it's a single image, height is 1
-            BackIsHidden: true,
-            UniqueBack: false,
-            Type: 0
-        };
+        // 3. Define the sheet image in CustomDeck (only once per sheet)
+        if (!customDeck[deckId]) {
+            customDeck[deckId.toString()] = {
+                // IMPORTANT: This 'FaceURL' must be the URL of the 10x7 SPRITE SHEET image,
+                // not an individual card image.
+                FaceURL: card.sheetUri || card.imageUri, 
+                BackURL: cardBackUrl,
+                NumWidth: 10,
+                NumHeight: 7,
+                BackIsHidden: true,
+                UniqueBack: false,
+                Type: 0
+            };
+        }
 
+        // 4. Create the Card Object for searching
         containedObjects.push({
             Name: "Card",
             Nickname: card.name || "Card",
-            CardID: cardId
+            CardID: cardId,
+            Transform: {
+                posX: 0, posY: 0, posZ: 0,
+                rotX: 0, rotY: 180, rotZ: 180,
+                scaleX: 1, scaleY: 1, scaleZ: 1
+            }
         });
     });
 
@@ -46,7 +65,7 @@ export function buildTTSJSON(deckName, cards) {
                     scaleX: 1, scaleY: 1, scaleZ: 1
                 },
                 DeckIDs: deckIDs,
-                CustomDeck: customDeck, // This now contains all 95 images
+                CustomDeck: customDeck,
                 ContainedObjects: containedObjects
             }
         ]
