@@ -30,7 +30,10 @@ export function buildTTSJSON(deckName, cards) {
         containedObjects.push({
             Name: "Card",
             Nickname: card.name, // The search name
-            CardID: cardId       // Must match the math above!
+            CardID: cardId,      // Must match the math above!
+            CustomDeck: {
+                [deckId.toString()]: customDeck[deckId.toString()]
+            }
         });
     });
 
