@@ -2,7 +2,6 @@ export function buildTTSJSON(deckName, cards) {
     if (cards.length === 0) {
         throw new Error("Deck must contain at least one card.");
     }
-
     const customDeck = {};
     const deckIDs = [];
     const containedObjects = [];
@@ -30,19 +29,19 @@ export function buildTTSJSON(deckName, cards) {
         containedObjects.push({
             Name: "Card",
             Nickname: card.name, // The search name
-            CardID: cardId,      // Must match the math above!
-            CustomDeck: {
-                [deckId.toString()]: customDeck[deckId.toString()]
-            }
+            CardID: cardId       // Must match the math above!
         });
     });
 
     return {
-        Name: "DeckCustom",
-        Nickname: deckName,
-        Transform: { posX: 0, posY: 1, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 },
-        DeckIDs: deckIDs,
-        CustomDeck: customDeck,
-        ContainedObjects: containedObjects
+        SaveName: deckName,
+        ObjectStates: [{
+            Name: "DeckCustom",
+            Nickname: deckName,
+            Transform: { posX: 0, posY: 1, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 },
+            DeckIDs: deckIDs,
+            CustomDeck: customDeck,
+            ContainedObjects: containedObjects
+        }]
     };
 }
