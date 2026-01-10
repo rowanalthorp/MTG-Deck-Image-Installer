@@ -2,7 +2,7 @@
 
 ### [Click Here to Goto Website](https://rowanalthorp.github.io/magic-the-tabletop-simulator-deck-generation/)
 
-<br><br>
+<br>
 
 # Welcome to: **magic-the-tabletop-simulator-deck-generation** (long name I know...) 
 <br>
