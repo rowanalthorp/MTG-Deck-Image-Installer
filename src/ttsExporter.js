@@ -50,7 +50,7 @@ export function buildTTSJSON(saveName, cards) {
   });
 
   const deckObject = {
-    Name: "Deck",
+    Name: "DeckCustom",
     Nickname: saveName || "My Generated Deck",
     Transform: { posX: 0, posY: 1, posZ: 0, rotX: 0, rotY: 180, rotZ: 180, scaleX: 1, scaleY: 1, scaleZ: 1 },
     GUID: deckGUID,
