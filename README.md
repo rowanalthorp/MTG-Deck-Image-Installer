@@ -4,7 +4,8 @@
 
 <br>
 
-# Welcome to: **magic-the-tabletop-simulator-deck-generation** (long name I know...) 
+# Welcome to: 
+# **magic-the-tabletop-simulator-deck-generation** (long name I know...) 
 <br>
 This applications takes your exported deck lists from a site like [Archidekt](https://archidekt.com/) and generates a working JSON that is ready to be imported into the Table Top Simulators Saved Objects Folder 
 <br>
